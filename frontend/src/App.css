@@ -1,0 +1,145 @@
+/* src/App.css */
+
+:root {
+  --primary-color: #007bff;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f4f4f4;
+  color: var(--dark-color);
+  margin: 0;
+}
+
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: var(--dark-color);
+  padding: 20px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.role-tag {
+  font-size: 0.8em;
+  font-weight: normal;
+  color: var(--warning-color);
+}
+
+.logout-btn {
+  background-color: var(--primary-color);
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.dashboard {
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.card-container {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.card-container .card {
+  flex: 1;
+}
+
+.login-container {
+  padding: 50px;
+}
+
+.login-container button {
+  margin: 10px;
+  padding: 15px 30px;
+  font-size: 1.2em;
+  cursor: pointer;
+  border-radius: 8px;
+  border: 1px solid var(--primary-color);
+  background-color: white;
+  color: var(--primary-color);
+}
+
+.login-container button:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.bike-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.bike-table th, .bike-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.bike-table th {
+  background-color: var(--light-color);
+}
+
+.status {
+  padding: 5px 10px;
+  border-radius: 15px;
+  color: white;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.status-disponivel { background-color: var(--success-color); }
+.status-alugada { background-color: var(--warning-color); }
+.status-vendida { background-color: var(--danger-color); }
+
+button {
+  cursor: pointer;
+  padding: 10px 15px;
+  border-radius: 5px;
+  border: none;
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-delete {
+  background-color: var(--danger-color);
+}
+
+.form-inline {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.form-inline input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.rented-info .timer {
+  font-size: 1.5em;
+  margin-top: 15px;
+  color: var(--primary-color);
+}

@@ -1,0 +1,38 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+    # A linha abaixo foi removida pois a URI do banco já está no app.py
+    # - DATABASE_URL=postgresql://user:password@db:5432/bikemania
+    depends_on:
+      - db
+    command: flask run --host=0.0.0.0
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3001:80"
+    volumes:
+      - ./frontend/src:/app/src
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=bikemania
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
