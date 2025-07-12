@@ -31,16 +31,7 @@ def login():
 @api.route('/users/<int:user_id>/rentals', methods=['GET'])
 def get_user_rentals(user_id):
     alugueis = Aluguel.query.filter_by(usuario_id=user_id).all()
-    if not alugueis:
-        return jsonify([]), 200 # Retorna lista vazia se não tiver aluguel
-    
-    results = [{
-        'bike_numero': aluguel.bike.numero,
-        'bike_tipo': aluguel.bike.tipo,
-        'data_inicio': aluguel.data_inicio.isoformat(),
-        'duracao': aluguel.duracao,
-        'funcionario_nome': aluguel.funcionario.nome
-    } for aluguel in alugueis]
+    results = [{'bike_numero': a.bike.numero, 'bike_tipo': a.bike.tipo, 'data_inicio': a.data_inicio.isoformat(), 'duracao_segundos': a.duracao_segundos, 'funcionario_nome': a.funcionario.nome} for a in alugueis]
     return jsonify(results), 200
 
 @api.route('/bikes', methods=['GET'])
@@ -73,19 +64,75 @@ def delete_bike(bike_id):
 @api.route('/rentals', methods=['POST'])
 def create_rental():
     data = request.get_json()
-    bike = Bike.query.get(data['bike_id'])
+    bike_id = data.get('bike_id')
+    usuario_id = data.get('usuario_id')
+    funcionario_id = data.get('funcionario_id')
+    duracao_segundos = data.get('duracao_segundos')
 
+    if not all([bike_id, usuario_id, funcionario_id, duracao_segundos]):
+        return jsonify({'message': 'Dados incompletos'}), 400
+
+    bike = Bike.query.get(bike_id)
     if not bike or bike.status != StatusBike.DISPONIVEL:
-        return jsonify({'error': 'Bike indisponível'}), 400
+        return jsonify({'message': 'Bike indisponível'}), 400
 
     new_rental = Aluguel(
-        usuario_id=data['usuario_id'],
-        bike_id=data['bike_id'],
-        funcionario_id=data['funcionario_id'], # Assumindo que o front envia o ID do funcionário logado
-        data_inicio=datetime.utcnow(),
-        duracao=data.get('duracao', 7200) # Duração em segundos, default 2 horas
+        usuario_id=usuario_id,
+        bike_id=bike_id,
+        funcionario_id=funcionario_id,
+        duracao_segundos=duracao_segundos
     )
     bike.status = StatusBike.ALUGADA
     db.session.add(new_rental)
     db.session.commit()
-    return jsonify({'message': 'Associação concluída'}), 201
+    return jsonify({'message': 'Aluguel criado com sucesso'}), 201
+
+@api.route('/bikes/<int:bike_id>/return', methods=['POST'])
+def return_bike(bike_id):
+    bike = Bike.query.get(bike_id)
+    if not bike:
+        return jsonify({'message': 'Bike não encontrada'}), 404
+    
+    aluguel = Aluguel.query.filter_by(bike_id=bike_id).first()
+    if aluguel:
+        db.session.delete(aluguel)
+
+    bike.status = StatusBike.DISPONIVEL
+    db.session.commit()
+    return jsonify({'message': f'Bike {bike_id} devolvida com sucesso'}), 200
+
+@api.route('/users', methods=['GET'])
+def get_users():
+    users = Usuario.query.all()
+    return jsonify([{'id': u.id, 'nome': u.nome, 'username': u.username} for u in users])
+
+@api.route('/users', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    # Adicionar validação de dados aqui seria uma boa prática
+    new_user = Usuario(
+        nome=data.get('nome'),
+        username=data.get('username'),
+        telefone=data.get('telefone')
+    )
+    new_user.set_password(data.get('password'))
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({'message': 'Usuário criado com sucesso'}), 201
+
+@api.route('/funcionarios', methods=['GET'])
+def get_funcionarios():
+    funcionarios = Funcionario.query.all()
+    return jsonify([{'id': f.id, 'nome': f.nome, 'username': f.username} for f in funcionarios])
+
+@api.route('/funcionarios', methods=['POST'])
+def create_funcionario():
+    data = request.get_json()
+    new_func = Funcionario(
+        nome=data.get('nome'),
+        username=data.get('username')
+    )
+    new_func.set_password(data.get('password'))
+    db.session.add(new_func)
+    db.session.commit()
+    return jsonify({'message': 'Funcionário criado com sucesso'}), 201
